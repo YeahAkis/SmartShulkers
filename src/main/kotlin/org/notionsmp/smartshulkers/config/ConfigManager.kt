@@ -26,11 +26,6 @@ class ConfigManager(private val plugin: SmartShulkers) {
         blacklistConfig = setupBlacklistConfig()
     }
 
-    fun disableSellShulkers() {
-        plugin.config.set("settings.sellshulker.enabled", false)
-        plugin.saveConfig()
-    }
-
     private fun setupPricesConfig(): YamlConfiguration {
         val file = File(plugin.dataFolder, "prices.yml")
         if (!file.exists()) {

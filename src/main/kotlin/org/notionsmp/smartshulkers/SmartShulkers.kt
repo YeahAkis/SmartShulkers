@@ -79,7 +79,6 @@ class SmartShulkers : JavaPlugin() {
                 logger.warning(" VAULT NOT FOUND OR NO ECONOMY PLUGIN INSTALLED!")
                 logger.warning(" Sell Shulker features will be disabled.")
                 logger.warning("==============================================")
-                configManager.disableSellShulkers()
             } else {
                 logger.info("Successfully hooked into ${if (isVaultUnlocked) "VaultUnlocked" else "Vault"} economy via ${economy?.name}")
                 if (configManager.isSellShulkerEnabled) {
@@ -221,29 +220,9 @@ class SmartShulkers : JavaPlugin() {
         if (uncraftRecipesRegistered) return
 
         SHULKER_BOX_TYPES.forEach { shulkerType ->
-            val smartKey = NamespacedKey(this, "uncraft_smartshulker_${shulkerType.name.lowercase()}")
-            val garbageKey = NamespacedKey(this, "uncraft_garbageshulker_${shulkerType.name.lowercase()}")
-            val sellKey = NamespacedKey(this, "uncraft_sellshulker_${shulkerType.name.lowercase()}")
-
-            if (!registeredRecipeKeys.contains(smartKey)) {
-                Bukkit.addRecipe(ShapelessRecipe(smartKey, ItemStack(shulkerType))
-                    .apply { addIngredient(shulkerType) }
-                )
-                registeredRecipeKeys.add(smartKey)
-            }
-
-            if (!registeredRecipeKeys.contains(garbageKey)) {
-                Bukkit.addRecipe(ShapelessRecipe(garbageKey, ItemStack(shulkerType))
-                    .apply { addIngredient(shulkerType) }
-                )
-                registeredRecipeKeys.add(garbageKey)
-            }
-
-            if (!registeredRecipeKeys.contains(sellKey)) {
-                Bukkit.addRecipe(ShapelessRecipe(sellKey, ItemStack(shulkerType))
-                    .apply { addIngredient(shulkerType) }
-                )
-                registeredRecipeKeys.add(sellKey)
+            val key = NamespacedKey(this, "uncraft_${shulkerType.name.lowercase()}")
+            if (registeredRecipeKeys.add(key)) {
+                Bukkit.addRecipe(ShapelessRecipe(key, ItemStack(shulkerType)).apply { addIngredient(shulkerType) })
             }
         }
         uncraftRecipesRegistered = true

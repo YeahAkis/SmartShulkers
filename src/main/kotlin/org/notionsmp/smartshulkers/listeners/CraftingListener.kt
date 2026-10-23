@@ -1,5 +1,6 @@
 package org.notionsmp.smartshulkers.listeners
 
+import org.bukkit.Keyed
 import org.bukkit.block.ShulkerBox
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -12,57 +13,43 @@ import org.notionsmp.smartshulkers.utils.ShulkerManager
 class CraftingListener(private val plugin: SmartShulkers) : Listener {
     @EventHandler
     fun onPrepareCraft(event: PrepareItemCraftEvent) {
-        val recipe = event.recipe ?: return
-        val matrix = event.inventory.matrix
-        val shulkerItem = matrix.firstOrNull { it != null && ShulkerManager.isShulkerBox(it.type) } ?: return
+        val key = (event.recipe as? Keyed)?.key ?: return
+        if (key.namespace != plugin.smartShulkerKey.namespace) return
 
-        if (ShulkerManager.isSmartShulker(shulkerItem) || ShulkerManager.isGarbageShulker(shulkerItem) || ShulkerManager.isSellShulker(shulkerItem)) {
-            val originalMeta = shulkerItem.itemMeta as? BlockStateMeta ?: return
-            val originalState = originalMeta.blockState as? ShulkerBox ?: return
+        val shulkerItem = event.inventory.matrix.firstOrNull { it != null && ShulkerManager.isShulkerBox(it.type) } ?: return
+        val special = ShulkerManager.isSmartShulker(shulkerItem) ||
+                ShulkerManager.isGarbageShulker(shulkerItem) ||
+                ShulkerManager.isSellShulker(shulkerItem)
 
-            val newItem = ItemStack(shulkerItem.type)
-            val newMeta = newItem.itemMeta as? BlockStateMeta ?: return
-            val newState = newMeta.blockState as? ShulkerBox ?: return
-
-            newState.inventory.contents = originalState.inventory.contents
-            newState.update()
-
-            newMeta.blockState = newState
-            newItem.itemMeta = newMeta
-
-            event.inventory.result = newItem
+        if (key.key.startsWith("uncraft_")) {
+            event.inventory.result = if (special) cleanCopy(shulkerItem) else null
             return
         }
 
-        if (ShulkerManager.isShulkerBox(recipe.result?.type)) {
-            val result = event.inventory.result ?: return
-
-            if (ShulkerManager.isSmartShulker(result)) {
-                if (!event.view.player.hasPermission(plugin.configManager.getString("permissions.craft_smartshulker")!!)) {
-                    event.inventory.result = null
-                    return
-                }
-                copyContents(shulkerItem, result)
-            }
-            else if (ShulkerManager.isGarbageShulker(result)) {
-                if (!event.view.player.hasPermission(plugin.configManager.getString("permissions.craft_garbageshulker")!!)) {
-                    event.inventory.result = null
-                }
-            }
-            else if (ShulkerManager.isSellShulker(result)) {
-                if (!event.view.player.hasPermission(plugin.configManager.getString("permissions.craft_sellshulker")!!)) {
-                    event.inventory.result = null
-                }
-            }
-
-            else {
-                event.inventory.result = null
-            }
-        }
-
-        else if (matrix.any { it != null && ShulkerManager.isShulkerBox(it.type) }) {
+        if (special) {
             event.inventory.result = null
+            return
         }
+
+        val result = event.inventory.result ?: return
+        val permissionPath = when {
+            ShulkerManager.isSmartShulker(result) -> "permissions.craft_smartshulker"
+            ShulkerManager.isGarbageShulker(result) -> "permissions.craft_garbageshulker"
+            ShulkerManager.isSellShulker(result) -> "permissions.craft_sellshulker"
+            else -> return
+        }
+
+        if (!event.view.player.hasPermission(plugin.configManager.getString(permissionPath)!!)) {
+            event.inventory.result = null
+            return
+        }
+        copyContents(shulkerItem, result)
+    }
+
+    private fun cleanCopy(source: ItemStack): ItemStack? {
+        val result = ItemStack(source.type)
+        copyContents(source, result)
+        return result
     }
 
     private fun copyContents(source: ItemStack, destination: ItemStack) {
