@@ -1,10 +1,12 @@
 package org.notionsmp.smartshulkers.config
 
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import org.notionsmp.smartshulkers.SmartShulkers
 import java.io.File
+import java.util.regex.PatternSyntaxException
 
 class ConfigManager(private val plugin: SmartShulkers) {
     private lateinit var pricesConfig: YamlConfiguration
@@ -85,20 +87,23 @@ class ConfigManager(private val plugin: SmartShulkers) {
         if (config.getBoolean("with-lore") && meta.hasLore()) return true
         if (config.getBoolean("with-cmd") && meta.hasCustomModelData()) return true
 
-        val namedItems = config.getStringList("named")
-        if (meta.hasDisplayName()) {
-            val displayComponent = meta.displayName() ?: return false
-            val plainText = plugin.mm.serialize(displayComponent)
-            return namedItems.any { pattern ->
-                try {
-                    plainText.matches(Regex(pattern))
-                } catch (e: Exception) {
-                    plainText.contains(pattern, ignoreCase = true)
-                }
-            }
-        }
+        if (!meta.hasDisplayName()) return false
+        val plainText = PlainTextComponentSerializer.plainText().serialize(meta.displayName() ?: return false)
+        return config.getStringList("named").any { matchesName(plainText, it) }
+    }
 
-        return false
+    private fun matchesName(name: String, pattern: String): Boolean {
+        val regexForm = Regex("^/(.*)/(i?)$").matchEntire(pattern)
+        return try {
+            if (regexForm != null) {
+                val options = if (regexForm.groupValues[2] == "i") setOf(RegexOption.IGNORE_CASE) else emptySet()
+                Regex(regexForm.groupValues[1], options).matches(name)
+            } else {
+                name.equals(pattern, ignoreCase = true)
+            }
+        } catch (e: PatternSyntaxException) {
+            name.contains(pattern, ignoreCase = true)
+        }
     }
 
     fun getSoundSettings(): SoundSettings {
