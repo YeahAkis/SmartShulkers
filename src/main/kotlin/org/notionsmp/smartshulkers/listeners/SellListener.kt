@@ -84,7 +84,7 @@ class SellListener(private val plugin: SmartShulkers) : Listener {
                         event.isCancelled = true
                         event.item.remove()
                     } else {
-                        event.item.itemStack.amount = remainingAmount
+                        event.item.itemStack = item.clone().apply { amount = remainingAmount }
                         event.isCancelled = true
                     }
 

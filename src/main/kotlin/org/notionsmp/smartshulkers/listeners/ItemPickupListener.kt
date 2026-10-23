@@ -54,7 +54,9 @@ class ItemPickupListener(private val plugin: SmartShulkers) : Listener {
         }
 
         if (remainingItems > 0) {
-            event.item.itemStack.amount = remainingItems
+            if (remainingItems != item.amount) {
+                event.item.itemStack = item.clone().apply { amount = remainingItems }
+            }
         } else {
             event.isCancelled = true
             event.item.remove()
