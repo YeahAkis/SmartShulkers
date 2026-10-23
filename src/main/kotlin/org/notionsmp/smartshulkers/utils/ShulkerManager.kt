@@ -1,10 +1,14 @@
 package org.notionsmp.smartshulkers.utils
 
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.block.Block
+import org.bukkit.block.ShulkerBox
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.BlockStateMeta
+import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
 import org.notionsmp.smartshulkers.SmartShulkers
 
@@ -28,12 +32,14 @@ object ShulkerManager {
                 item.itemMeta?.persistentDataContainer?.has(SmartShulkers.instance.sellShulkerKey) == true
     }
 
-    fun getShulkerItems(shulker: ItemStack?): List<Material> = readMaterials(shulker, SmartShulkers.instance.itemsKey)
+    fun getShulkerItems(shulker: ItemStack?): List<Material> =
+        readMaterials(shulker?.itemMeta?.persistentDataContainer, SmartShulkers.instance.itemsKey)
 
-    fun getShulkerBlacklist(shulker: ItemStack?): List<Material> = readMaterials(shulker, SmartShulkers.instance.blacklistKey)
+    fun getShulkerBlacklist(shulker: ItemStack?): List<Material> =
+        readMaterials(shulker?.itemMeta?.persistentDataContainer, SmartShulkers.instance.blacklistKey)
 
-    private fun readMaterials(shulker: ItemStack?, key: NamespacedKey): List<Material> {
-        return shulker?.itemMeta?.persistentDataContainer?.get(key, PersistentDataType.STRING)
+    private fun readMaterials(pdc: PersistentDataContainer?, key: NamespacedKey): List<Material> {
+        return pdc?.get(key, PersistentDataType.STRING)
             ?.split(",")
             ?.mapNotNull { runCatching { Material.valueOf(it) }.getOrNull() }
             ?: emptyList()
@@ -108,6 +114,31 @@ object ShulkerManager {
 
     fun createSellShulker(baseItem: ItemStack, items: List<Material>, blacklist: List<Material> = emptyList()) =
         createShulker(baseItem, SmartShulkers.instance.sellShulkerKey, items, blacklist)
+
+    fun itemFromBlock(block: Block): ItemStack? {
+        val plugin = SmartShulkers.instance
+        val box = block.state as? ShulkerBox ?: return null
+        val meta = Bukkit.getItemFactory().getItemMeta(block.type) as? BlockStateMeta ?: return null
+        meta.blockState = box
+        val pdc = meta.persistentDataContainer
+
+        val creator: (ItemStack, List<Material>, List<Material>) -> ItemStack = when {
+            pdc.has(plugin.smartShulkerKey) && plugin.configManager.isSmartShulkerEnabled -> ::createSmartShulker
+            pdc.has(plugin.garbageShulkerKey) && plugin.configManager.isGarbageShulkerEnabled -> ::createGarbageShulker
+            pdc.has(plugin.sellShulkerKey) && plugin.configManager.isSellShulkerEnabled -> ::createSellShulker
+            else -> return null
+        }
+
+        val item = creator(ItemStack(block.type), readMaterials(pdc, plugin.itemsKey), readMaterials(pdc, plugin.blacklistKey))
+        val newMeta = item.itemMeta as BlockStateMeta
+        val newBox = newMeta.blockState as ShulkerBox
+        box.inventory.contents.forEachIndexed { index, stack ->
+            if (stack != null) newBox.inventory.setItem(index, stack)
+        }
+        newMeta.blockState = newBox
+        item.itemMeta = newMeta
+        return item
+    }
 
     fun getItemName(material: Material): String {
         return material.translationKey()
