@@ -8,7 +8,6 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.plugin.RegisteredServiceProvider
 import org.bukkit.plugin.java.JavaPlugin
 import org.notionsmp.smartshulkers.commands.ShulkerCommands
 import org.notionsmp.smartshulkers.config.ConfigManager
@@ -44,7 +43,6 @@ class SmartShulkers : JavaPlugin() {
     lateinit var commandManager: PaperCommandManager
     val mm = MiniMessage.miniMessage()
     var economy: Economy? = null
-    private var isVaultUnlocked = false
     private val economySetupDelay = 20L
 
     lateinit var smartShulkerKey: NamespacedKey
@@ -80,7 +78,7 @@ class SmartShulkers : JavaPlugin() {
                 logger.warning(" Sell Shulker features will be disabled.")
                 logger.warning("==============================================")
             } else {
-                logger.info("Successfully hooked into ${if (isVaultUnlocked) "VaultUnlocked" else "Vault"} economy via ${economy?.name}")
+                logger.info("Successfully hooked into Vault economy via ${economy?.name}")
                 if (configManager.isSellShulkerEnabled) {
                     removeRecipesByType(sellShulkerKey)
                     registerSellRecipes()
@@ -91,28 +89,15 @@ class SmartShulkers : JavaPlugin() {
     }
 
     private fun setupEconomy(): Boolean {
-        val rsp: RegisteredServiceProvider<Economy>? = server.servicesManager.getRegistration(Economy::class.java)
-        if (rsp != null) {
+        if (server.pluginManager.getPlugin("Vault") == null) return false
+
+        return try {
+            val rsp = server.servicesManager.getRegistration(Economy::class.java) ?: return false
             economy = rsp.provider
-            if (economy != null) {
-                isVaultUnlocked = false
-                return true
-            }
+            true
+        } catch (e: NoClassDefFoundError) {
+            false
         }
-
-        try {
-            val vaultUnlockedClass = Class.forName("net.milkbowl.vault2.economy.Economy")
-            val rspV2 = server.servicesManager.getRegistration(vaultUnlockedClass)
-            if (rspV2 != null) {
-                economy = rspV2.provider as Economy
-                isVaultUnlocked = true
-                return true
-            }
-        } catch (e: ClassNotFoundException) {
-            logger.info("VaultUnlocked economy class not found, using standard Vault")
-        }
-
-        return false
     }
 
     private fun initializeKeys() {
