@@ -14,7 +14,7 @@ Combine a shulker box (any color) with one extra item in a crafting grid. The co
 | Garbage Shulker | Lava Bucket | Deletes matching items you walk over |
 | Sell Shulker | Emerald | Sells matching items for money, needs Vault and an economy plugin |
 
-Dyeing still works the normal way. A dyed Smart, Garbage or Sell Shulker keeps its type, filter and contents.
+Dyeing still works the normal way. A dyed Smart, Garbage or Sell Shulker keeps its type, filter and contents, and so does one that a piston, dispenser or water breaks.
 
 To turn one back into a plain shulker box, put it alone in a crafting grid. The contents stay.
 

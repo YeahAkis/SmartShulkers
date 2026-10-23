@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Smart, Garbage and Sell Shulkers keep their type, filter and contents when a piston, dispenser or flowing water breaks them, before they dropped as plain shulker boxes
+
 ## 1.1.0
 
 - Added a blacklist to every shulker. Left click with an item still edits the whitelist, right click now edits the blacklist. A shulker with only a blacklist takes everything except the listed items
