@@ -30,7 +30,7 @@ class ItemPickupListener(private val plugin: SmartShulkers) : Listener {
                 if (remainingItems <= 0) return@forEach
 
                 if (ShulkerManager.isSmartShulker(inventoryItem) &&
-                    ShulkerManager.getShulkerItems(inventoryItem).contains(itemType)) {
+                    ShulkerManager.accepts(inventoryItem, itemType)) {
 
                     val added = tryAddToShulker(event, player, inventoryItem, item.clone().apply { amount = remainingItems }, "smartshulker")
                     if (added > 0) {
@@ -45,7 +45,7 @@ class ItemPickupListener(private val plugin: SmartShulkers) : Listener {
                 if (remainingItems <= 0) return@forEach
 
                 if (ShulkerManager.isGarbageShulker(inventoryItem) &&
-                    ShulkerManager.getShulkerItems(inventoryItem).contains(itemType)) {
+                    ShulkerManager.accepts(inventoryItem, itemType)) {
 
                     handleGarbagePickup(event, player, item.clone().apply { amount = remainingItems })
                     remainingItems = 0

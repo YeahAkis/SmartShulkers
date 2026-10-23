@@ -2,6 +2,7 @@ package org.notionsmp.smartshulkers.listeners
 
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.block.ShulkerBox
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -35,15 +36,13 @@ class BlockBreakListener(private val plugin: SmartShulkers) : Listener {
         event: BlockBreakEvent,
         meta: BlockStateMeta,
         contents: Array<ItemStack?>,
-        creator: (ItemStack, List<Material>) -> ItemStack
+        creator: (ItemStack, List<Material>, List<Material>) -> ItemStack
     ) {
         event.isDropItems = false
-        val items = meta.persistentDataContainer.get(plugin.itemsKey, PersistentDataType.STRING)
-            ?.split(",")
-            ?.mapNotNull { runCatching { Material.valueOf(it) }.getOrNull() }
-            ?: emptyList()
+        val items = readMaterials(meta, plugin.itemsKey)
+        val blacklist = readMaterials(meta, plugin.blacklistKey)
 
-        val newShulker = creator(ItemStack(event.block.type), items)
+        val newShulker = creator(ItemStack(event.block.type), items, blacklist)
         val newMeta = newShulker.itemMeta as BlockStateMeta
         val newShulkerBox = newMeta.blockState as ShulkerBox
 
@@ -57,4 +56,10 @@ class BlockBreakListener(private val plugin: SmartShulkers) : Listener {
         newShulker.itemMeta = newMeta
         event.block.world.dropItemNaturally(event.block.location.add(0.5, 0.5, 0.5), newShulker)
     }
+
+    private fun readMaterials(meta: BlockStateMeta, key: NamespacedKey): List<Material> =
+        meta.persistentDataContainer.get(key, PersistentDataType.STRING)
+            ?.split(",")
+            ?.mapNotNull { runCatching { Material.valueOf(it) }.getOrNull() }
+            ?: emptyList()
 }

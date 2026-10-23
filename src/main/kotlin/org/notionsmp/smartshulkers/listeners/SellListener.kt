@@ -27,7 +27,7 @@ class SellListener(private val plugin: SmartShulkers) : Listener {
         player.inventory.contents.forEachIndexed { index, inventoryItem ->
             if (inventoryItem != null &&
                 ShulkerManager.isSellShulker(inventoryItem) &&
-                ShulkerManager.getShulkerItems(inventoryItem).contains(item.type)) {
+                ShulkerManager.accepts(inventoryItem, item.type)) {
 
                 if (!plugin.configManager.isSellShulkerEnabled) return
 
@@ -45,12 +45,7 @@ class SellListener(private val plugin: SmartShulkers) : Listener {
         item: ItemStack
     ) {
         val price = plugin.configManager.getPrice(item.type.name)
-        if (price <= 0.0) {
-            SoundManager.playSound(player, "sounds.error")
-            sendShulkerMessage(player, "sellshulker", item, price, true)
-            event.isCancelled = true
-            return
-        }
+        if (price <= 0.0) return
 
         val meta = shulker.itemMeta as? BlockStateMeta ?: return
         val shulkerBox = meta.blockState as? ShulkerBox ?: return

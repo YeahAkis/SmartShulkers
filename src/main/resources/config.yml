@@ -32,6 +32,8 @@ settings:
       accepts: "<gray>Accepts:"
       itemnames: "<dark_gray>- <item>"
       empty: "<dark_gray>- None"
+      blacklist: "<gray>Excludes:"
+      blacklist_itemnames: "<dark_red>- <item>"
     message:
       enabled: true
       type: ACTIONBAR # Valid options: CHAT, ACTIONBAR
@@ -44,6 +46,8 @@ settings:
       accepts: "<gray>Destroys:"
       itemnames: "<dark_gray>- <item>"
       empty: "<dark_gray>- None"
+      blacklist: "<gray>Excludes:"
+      blacklist_itemnames: "<dark_red>- <item>"
     message:
       enabled: true
       type: ACTIONBAR # Valid options: CHAT, ACTIONBAR
@@ -56,6 +60,8 @@ settings:
       accepts: "<gray>Sells:"
       itemnames: "<dark_gray>- <item>"
       empty: "<dark_gray>- None"
+      blacklist: "<gray>Excludes:"
+      blacklist_itemnames: "<dark_red>- <item>"
     message:
       enabled: true
       type: ACTIONBAR # Valid options: CHAT, ACTIONBAR

@@ -49,6 +49,7 @@ class SmartShulkers : JavaPlugin() {
     lateinit var garbageShulkerKey: NamespacedKey
     lateinit var sellShulkerKey: NamespacedKey
     lateinit var itemsKey: NamespacedKey
+    lateinit var blacklistKey: NamespacedKey
 
     private val registeredRecipeKeys = mutableSetOf<NamespacedKey>()
     private var uncraftRecipesRegistered = false
@@ -105,6 +106,7 @@ class SmartShulkers : JavaPlugin() {
         garbageShulkerKey = NamespacedKey(this, "garbageshulker")
         sellShulkerKey = NamespacedKey(this, "sellshulker")
         itemsKey = NamespacedKey(this, "shulkeritems")
+        blacklistKey = NamespacedKey(this, "shulkerblacklist")
     }
 
     private fun registerManagers() {
