@@ -13,6 +13,7 @@ class InventoryClickListener(private val plugin: SmartShulkers) : Listener {
 
     @EventHandler
     fun onInventoryClick(event: InventoryClickEvent) {
+        if (!plugin.config.getBoolean("settings.general.filter-methods.inventory-click", true)) return
         if (!FilterEditor.isAnyTypeEnabled()) return
 
         if (event.click != ClickType.LEFT && event.click != ClickType.RIGHT) return

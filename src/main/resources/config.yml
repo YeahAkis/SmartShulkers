@@ -18,6 +18,9 @@ settings:
       source: VOICE # Available options can be found on https://jd.papermc.io/paper/1.21.5/org/bukkit/SoundCategory.html
       volume: 1.0
       pitch: 1.0
+    filter-methods:
+      inventory-click: true # Click a shulker with an item in your inventory (left = whitelist, right = blacklist). Turn off if sorting mods change filters by accident
+      hand-shortcut: true # Shulker in the off hand, item in the main hand, sneak and click the air (left = whitelist, right = blacklist)
     ignore-items:
       with-name: false
       with-lore: true

@@ -118,6 +118,7 @@ class SmartShulkers : JavaPlugin() {
     private fun registerListeners() {
         server.pluginManager.registerEvents(BlockBreakListener(this), this)
         server.pluginManager.registerEvents(InventoryClickListener(this), this)
+        server.pluginManager.registerEvents(HandFilterListener(this), this)
         server.pluginManager.registerEvents(ItemPickupListener(this), this)
         server.pluginManager.registerEvents(CraftingListener(this), this)
     }
