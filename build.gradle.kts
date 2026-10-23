@@ -3,6 +3,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.ajoberstar.grgit") version "5.2.0"
+    id("com.modrinth.minotaur") version "2.8.7"
 }
 
 fun getGitCommitHash(): String {
@@ -94,4 +95,22 @@ tasks.processResources {
     filesMatching("paper-plugin.yml") {
         expand(props)
     }
+}
+
+val supportedGameVersions = listOf(
+    "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8",
+    "1.21.9", "1.21.10", "1.21.11", "26.1", "26.1.1", "26.1.2", "26.2", "26.3"
+)
+
+modrinth {
+    token.set(providers.gradleProperty("modrinthToken").orElse(providers.environmentVariable("MODRINTH_TOKEN")))
+    projectId.set("smartshulker")
+    versionNumber.set(project.version.toString())
+    versionName.set("SmartShulkers ${project.version}")
+    versionType.set("release")
+    uploadFile.set(tasks.shadowJar)
+    gameVersions.addAll(supportedGameVersions)
+    loaders.addAll("paper", "purpur")
+    changelog.set(providers.provider { file("CHANGELOG.md").readText().substringAfter("## ").substringBefore("\n## ").substringAfter("\n").trim() })
+    debugMode.set(providers.gradleProperty("modrinthDryRun").isPresent)
 }
