@@ -30,24 +30,30 @@ object FilterEditor {
 
         if (!player.hasPermission(config.getString("permissions.modify_$typeName")!!)) return null
 
-        if (!blacklist) {
-            val allowed = if (typeKey == plugin.sellShulkerKey) config.canSellItem(item.type) else !config.isBlacklisted(item.type)
-            if (!allowed) {
+        var whitelist = ShulkerManager.getShulkerItems(shulker)
+        var blacklistItems = ShulkerManager.getShulkerBlacklist(shulker)
+        val removing = item.type in (if (blacklist) blacklistItems else whitelist)
+
+        if (!removing) {
+            if (blacklist && whitelist.isNotEmpty() || !blacklist && blacklistItems.isNotEmpty()) {
                 SoundManager.playSound(player, "sounds.error")
-                sendError(player, settingsPath)
+                sendMessage(player, settingsPath, if (blacklist) "has_whitelist" else "has_blacklist")
                 return null
+            }
+            if (!blacklist) {
+                val allowed = if (typeKey == plugin.sellShulkerKey) config.canSellItem(item.type) else !config.isBlacklisted(item.type)
+                if (!allowed) {
+                    SoundManager.playSound(player, "sounds.error")
+                    sendMessage(player, settingsPath, "error")
+                    return null
+                }
             }
         }
 
-        var whitelist = ShulkerManager.getShulkerItems(shulker)
-        var blacklistItems = ShulkerManager.getShulkerBlacklist(shulker)
-
         if (blacklist) {
-            blacklistItems = if (item.type in blacklistItems) blacklistItems - item.type else blacklistItems + item.type
-            whitelist = whitelist - item.type
+            blacklistItems = if (removing) blacklistItems - item.type else blacklistItems + item.type
         } else {
-            whitelist = if (item.type in whitelist) whitelist - item.type else whitelist + item.type
-            blacklistItems = blacklistItems - item.type
+            whitelist = if (removing) whitelist - item.type else whitelist + item.type
         }
 
         return shulker.clone().apply {
@@ -64,11 +70,11 @@ object FilterEditor {
         }
     }
 
-    private fun sendError(player: Player, settingsPath: String) {
+    private fun sendMessage(player: Player, settingsPath: String, key: String) {
         val messagePath = "$settingsPath.message"
         val config = plugin().config
         if (!config.getBoolean("$messagePath.enabled", true)) return
-        val message = config.getString("$messagePath.error") ?: return
+        val message = config.getString("$messagePath.$key") ?: return
 
         when (config.getString("$messagePath.type")?.uppercase() ?: "ACTIONBAR") {
             "CHAT" -> player.sendMessage(plugin().mm.deserialize(message))

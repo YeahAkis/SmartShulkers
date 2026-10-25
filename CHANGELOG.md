@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- A shulker now has either a whitelist or a blacklist, not both (#12). Adding to one while the other has items shows an error, and the lore only shows the list in use
+
 ## 1.1.1
 
 - Smart, Garbage and Sell Shulkers keep their type, filter and contents when a piston, dispenser or flowing water breaks them, before they dropped as plain shulker boxes

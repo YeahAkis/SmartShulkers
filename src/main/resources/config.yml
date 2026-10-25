@@ -42,6 +42,8 @@ settings:
       type: ACTIONBAR # Valid options: CHAT, ACTIONBAR
       contents: "<green>Picked up <amount> <item>!"
       error: "<red>This item cannot be added to Smart Shulkers!"
+      has_whitelist: "<red>This shulker has a whitelist, clear it before adding a blacklist!"
+      has_blacklist: "<red>This shulker has a blacklist, clear it before adding a whitelist!"
   garbageshulker:
     name: "<gradient:red:dark_red>Garbage Shulker</gradient>"
     enabled: true
@@ -56,6 +58,8 @@ settings:
       type: ACTIONBAR # Valid options: CHAT, ACTIONBAR
       contents: "<red>Deleted <amount> <item>!"
       error: "<red>This item cannot be added to Garbage Shulkers!"
+      has_whitelist: "<red>This shulker has a whitelist, clear it before adding a blacklist!"
+      has_blacklist: "<red>This shulker has a blacklist, clear it before adding a whitelist!"
   sellshulker:
     name: "<gradient:green:dark_green>Sell Shulker</gradient>"
     enabled: true
@@ -70,4 +74,6 @@ settings:
       type: ACTIONBAR # Valid options: CHAT, ACTIONBAR
       sell: "<green>Sold <amount> <item> for <price>!"
       error: "<red>This item cannot be sold!"
+      has_whitelist: "<red>This shulker has a whitelist, clear it before adding a blacklist!"
+      has_blacklist: "<red>This shulker has a blacklist, clear it before adding a whitelist!"
     sell_when: INSTA # Options: FULL, LAST_SLOT, STACK, INSTA

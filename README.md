@@ -29,7 +29,7 @@ You can also do it without opening the inventory: hold the shulker in your off h
 
 Both ways can be switched off under `settings.general.filter-methods` in `config.yml` (`inventory-click` and `hand-shortcut`). If a sorting mod keeps changing filters, turn off `inventory-click`.
 
-An item is only ever on one list, adding it to one takes it off the other. The lore on the shulker shows both lists.
+A shulker has either a whitelist or a blacklist, never both. Once one list has an item, the other is locked until you empty it again. The lore on the shulker shows whichever list is in use.
 
 With a whitelist, the shulker only takes the listed items. With only a blacklist, it takes everything except the listed items (items in `blacklist.yml` are still skipped). A blacklisted item is never taken. Sell Shulkers only sell items that have a price in `prices.yml`.
 

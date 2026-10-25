@@ -66,7 +66,9 @@ object ShulkerManager {
         val blacklistLine = config.getString("$settingsPath.lore.blacklist_itemnames") ?: "<dark_red>- <item>"
 
         return buildList {
-            add(plugin.mm.deserialize(config.getString("$settingsPath.lore.accepts")!!))
+            if (blacklist.isEmpty()) {
+                add(plugin.mm.deserialize(config.getString("$settingsPath.lore.accepts")!!))
+            }
             if (items.isEmpty() && blacklist.isEmpty()) {
                 add(plugin.mm.deserialize(config.getString("$settingsPath.lore.empty")!!))
             }
