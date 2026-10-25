@@ -31,6 +31,8 @@ Both ways can be switched off under `settings.general.filter-methods` in `config
 
 A shulker has either a whitelist or a blacklist, never both. Once one list has an item, the other is locked until you empty it again. The lore on the shulker shows whichever list is in use.
 
+To wipe the filter in one go, hold the shulker in either hand and run `/ss clear`.
+
 With a whitelist, the shulker only takes the listed items. With only a blacklist, it takes everything except the listed items (items in `blacklist.yml` are still skipped). A blacklisted item is never taken. Sell Shulkers only sell items that have a price in `prices.yml`.
 
 ## Selling
@@ -59,6 +61,7 @@ DIAMONDx3: 300    # 3 diamonds = 300, so 100 each
 | --- | --- | --- |
 | `/smartshulkers reload` (`/ss rl`) | `smartshulkers.reload` | Reloads the config and recipes |
 | `/smartshulkers sellall` | `smartshulkers.sell.command` | Sells everything sellable in every Sell Shulker you carry |
+| `/smartshulkers clear` | the shulker's modify permission | Clears the filter of the shulker in your hand |
 
 The crafting and filter permissions are configurable under `permissions` in `config.yml`:
 

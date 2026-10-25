@@ -7,6 +7,7 @@ import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.Player
 import org.bukkit.inventory.meta.BlockStateMeta
 import org.notionsmp.smartshulkers.SmartShulkers
+import org.notionsmp.smartshulkers.utils.FilterEditor
 import org.notionsmp.smartshulkers.utils.SoundManager
 import org.notionsmp.smartshulkers.utils.ShulkerManager
 
@@ -19,6 +20,28 @@ class ShulkerCommands(private val plugin: SmartShulkers) : BaseCommand() {
     fun onReload(player: Player) {
         plugin.reload()
         player.sendMessage(mm.deserialize("<green>SmartShulkers config reloaded!"))
+    }
+
+    @Subcommand("clear")
+    fun onClear(player: Player) {
+        val inventory = player.inventory
+        val offHand = FilterEditor.typeKeyOf(inventory.itemInMainHand) == null
+        val shulker = if (offHand) inventory.itemInOffHand else inventory.itemInMainHand
+        val typeKey = FilterEditor.typeKeyOf(shulker)
+        if (typeKey == null) {
+            player.sendMessage(mm.deserialize("<red>Hold a Smart, Garbage or Sell Shulker to clear its filter!"))
+            return
+        }
+
+        val cleared = FilterEditor.clear(player, shulker, typeKey)
+        if (cleared == null) {
+            SoundManager.playSound(player, "sounds.error")
+            player.sendMessage(mm.deserialize("<red>You can't change the filter of this shulker!"))
+            return
+        }
+
+        if (offHand) inventory.setItemInOffHand(cleared) else inventory.setItemInMainHand(cleared)
+        player.sendMessage(mm.deserialize("<green>Filter cleared!"))
     }
 
     @Subcommand("sellall")

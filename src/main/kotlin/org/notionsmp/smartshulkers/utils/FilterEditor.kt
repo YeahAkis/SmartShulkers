@@ -70,6 +70,23 @@ object FilterEditor {
         }
     }
 
+    fun clear(player: Player, shulker: ItemStack, typeKey: NamespacedKey): ItemStack? {
+        val plugin = SmartShulkers.instance
+        val settingsPath = ShulkerManager.settingsPath(typeKey)
+        val typeName = settingsPath.substringAfterLast('.')
+
+        if (!player.hasPermission(plugin.configManager.getString("permissions.modify_$typeName")!!)) return null
+
+        return shulker.clone().apply {
+            editMeta { meta ->
+                val pdc = meta.persistentDataContainer
+                pdc.set(plugin.itemsKey, PersistentDataType.STRING, "")
+                pdc.remove(plugin.blacklistKey)
+                meta.lore(ShulkerManager.buildLore(settingsPath, emptyList(), emptyList()))
+            }
+        }
+    }
+
     private fun sendMessage(player: Player, settingsPath: String, key: String) {
         val messagePath = "$settingsPath.message"
         val config = plugin().config

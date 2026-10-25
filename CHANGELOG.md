@@ -3,6 +3,7 @@
 ## 1.2.0
 
 - A shulker now has either a whitelist or a blacklist, not both (#12). Adding to one while the other has items shows an error, and the lore only shows the list in use
+- Added `/ss clear`, which empties the whitelist or blacklist of the shulker in your hand (#13)
 
 ## 1.1.1
 
